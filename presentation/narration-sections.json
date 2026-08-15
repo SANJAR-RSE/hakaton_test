@@ -1,0 +1,35 @@
+{
+  "sections": [
+    {
+      "id": "hook",
+      "slide": "Kirish",
+      "text": "Assalomu alaykum. Tasavvur qiling: ertalab soat 8 da siz Toshkentdagi poliklinikaga keldingiz. Qo'lingizda — qog'oz navbat raqami. Atrofingizda — o'nlab bemor. Va hech kim sizga aniq javob bera olmaydi: \"Mening navbatim qachon keladi?\"",
+      "generated": true
+    },
+    {
+      "id": "problem",
+      "slide": "Muammo",
+      "text": "Bemorlar soatlab jonli navbatda kutishadi va navbat qachon kelishini bilishmaydi. Yana bir muammo — o'tgan ko'rik va tahlil natijalari qog'ozda yo'qolib qoladi, bemor tibbiy tarixini bir joyda ko'ra olmaydi."
+    },
+    {
+      "id": "solution",
+      "slide": "Yechim",
+      "text": "Shuning uchun biz MedQueue Tashkent'ni yaratdik — onlayn navbat olish, Telegram orqali avtomatik bildirishnoma, va tibbiy tarixni bitta joyda ko'rish imkonini beruvchi platforma. Bemor uch qadam bosadi: klinika, bo'lim, va navbat raqami — tayyor."
+    },
+    {
+      "id": "architecture",
+      "slide": "Arxitektura",
+      "text": "Loyiha to'rt qismdan iborat: veb ilova, tanishtiruv sahifasi, backend API va Telegram bot. Frontend — Next.js, dark va light rejim, uch til. Backend — Express va MongoDB. Bot — Telegraf, xuddi shu API'ga ulangan. Frontend Vercel'da, backend va bot — Render'da jonli ishlaydi."
+    },
+    {
+      "id": "demo",
+      "slide": "Live Demo",
+      "text": "Keling, jonli ko'ramiz. Bemor sifatida ro'yxatdan o'taman, klinika va bo'limni tanlayman — kartalar chiroyli chiqadi — va navbat olaman. Shifokor bemorni chaqiradi, tasdiqlaydi, natijani yozadi. Shu daqiqada bemorning Telegram botiga avtomatik xabar keladi: navbat yaqinlashdi."
+    },
+    {
+      "id": "result",
+      "slide": "Natija",
+      "text": "Natijada — to'liq deploy qilingan mahsulot: uch tilda, dark va light rejimda, mobilda ham ishlaydigan interfeys. Bemor uchun kam kutish, shifokor uchun qulay boshqaruv, va tibbiy tarix endi raqamli. MedQueue Tashkent — bu odamlarning vaqtini qadrlash haqida. Rahmat."
+    }
+  ]
+}

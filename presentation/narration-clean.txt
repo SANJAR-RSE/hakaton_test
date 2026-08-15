@@ -1,0 +1,19 @@
+Assalomu alaykum. Tasavvur qiling: ertalab soat 8 da siz Toshkentdagi poliklinikaga keldingiz. Qo'lingizda — qog'oz navbat raqami. Atrofingizda — o'nlab bemor. Va hech kim sizga aniq javob bera olmaydi: "Mening navbatim qachon keladi?"
+
+Bu — O'zbekiston shifoxonalari va poliklinikalarining kundalik voqeligi. Bemorlar soatlab jonli navbatda kutishadi, navbat qachon kelishini bilishmaydi. Va yana bir muammo — o'tgan ko'riklar, tahlil natijalari qog'ozda yoki umuman yo'qolib qoladi. Bemor o'z tibbiy tarixini bir joyda ko'ra olmaydi.
+
+Shuning uchun biz MedQueue Tashkent'ni yaratdik — bemorlarga onlayn navbat olish, navbat yaqinlashganda Telegram orqali avtomatik xabar olish, va o'z tibbiy tarixini — barcha ko'rik va tahlil natijalarini — bitta joyda ko'rish imkonini beruvchi platforma.
+
+Bemor uch qadam bosadi: klinikani tanlaydi, bo'lim yoki tahlil turini tanlaydi, va navbat raqamini oladi. Vassalom — endi u soatlab tik turib kutishi shart emas.
+
+Endi qisqacha texnik arxitektura haqida. Loyiha to'rtta mustaqil qismdan iborat: veb ilova, tanishtiruv sahifasi, backend API, va Telegram bot — barchasi bitta repozitoriyda, lekin alohida-alohida deploy qilingan.
+
+Frontend — Next.js va Tailwind CSS asosida qurilgan, dark va light rejimni, hamda o'zbek, rus va ingliz tillarini qo'llab-quvvatlaydi. Backend — Express va MongoDB Atlas asosida, JWT autentifikatsiya bilan himoyalangan. Telegram bot — Telegraf kutubxonasi orqali, xuddi shu backend API'ga ulangan — bu shuni anglatadiki, veb-sayt orqali ham, bot orqali ham foydalanuvchi bir xil holatni ko'radi. Frontend — Vercel'da, backend va bot — Render platformasida jonli ishlab turibdi.
+
+Keling, buni jonli ko'ramiz. Men bemor sifatida ro'yxatdan o'taman, klinikani tanlayman, bo'limni tanlayman — mana, kartalar chiroyli ko'rinishda chiqadi, va navbat olaman. Mana — navbat raqamim tayyor!
+
+Endi shifokor paneliga o'taman. Bu yerda shifokor bemorni chaqiradi, tasdiqlaydi, va qabul tugagach — natijani yozadi. Va aynan shu daqiqada — bemorning Telegram botiga avtomatik xabar keladi: "Navbatingizga uch kishi qoldi". Hech qanday qo'lda ishlov berish yo'q — hammasi avtomatik.
+
+Natijada nima bor? Ishlaydigan, to'liq deploy qilingan mahsulot: uch tilda, ikkala rejimda, mobil qurilmada ham to'g'ri ishlaydigan interfeys. Bemor uchun — kam kutish. Shifokor uchun — qulay boshqaruv. Va eng muhimi — tibbiy tarix endi qog'ozda emas, raqamli va doim qo'l ostida.
+
+MedQueue Tashkent — bu navbatlarni emas, odamlarning vaqtini qadrlash haqida. E'tiboringiz uchun rahmat.

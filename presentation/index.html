@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MedQueue Tashkent — Taqdimot</title>
+<style>
+  :root {
+    --bg: #0b1512;
+    --bg-soft: #0f1e19;
+    --card: #122620;
+    --border: #1e3830;
+    --text: #eefcf7;
+    --text-dim: #9fc9bd;
+    --brand: #1fb08c;
+    --brand-light: #45cba5;
+    --brand-dark: #11725d;
+    --accent-sky: #38bdf8;
+    --accent-violet: #a78bfa;
+    --accent-amber: #fbbf24;
+    --accent-red: #f87171;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, "Inter", Arial, sans-serif;
+    overflow: hidden;
+  }
+
+  #stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6vh 8vw;
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--brand-light);
+    font-weight: 700;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--brand-light);
+    box-shadow: 0 0 0 4px rgba(69, 203, 165, 0.18);
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin: 0 0 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .accent { color: var(--brand-light); }
+
+  .subtitle {
+    font-size: clamp(1rem, 2.1vw, 1.35rem);
+    color: var(--text-dim);
+    max-width: 46em;
+    margin: 0 auto 8px;
+    line-height: 1.5;
+  }
+
+  .logo-badge {
+    width: 74px;
+    height: 74px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    font-weight: 800;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 40px -8px rgba(31, 176, 140, 0.55);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 44px;
+    width: 100%;
+    max-width: 980px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card .icon { font-size: 1.8rem; }
+  .card h3 { margin: 0; font-size: 1.05rem; font-weight: 700; }
+  .card p { margin: 0; font-size: 0.88rem; color: var(--text-dim); line-height: 1.45; }
+
+  .card.sky { border-color: rgba(56, 189, 248, 0.35); }
+  .card.violet { border-color: rgba(167, 139, 250, 0.35); }
+  .card.amber { border-color: rgba(251, 191, 36, 0.35); }
+  .card.brand { border-color: rgba(31, 176, 140, 0.4); }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 40px;
+    max-width: 900px;
+  }
+
+  .flow-step {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 12px 20px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .flow-arrow { color: var(--text-dim); font-size: 1.1rem; }
+
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+    width: 100%;
+    max-width: 1020px;
+  }
+
+  .arch-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .arch-box .icon { font-size: 1.6rem; }
+  .arch-box h4 { margin: 0; font-size: 0.95rem; }
+  .arch-box span { font-size: 0.76rem; color: var(--text-dim); }
+
+  .deploy-row {
+    margin-top: 22px;
+    display: flex;
+    gap: 14px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .pill {
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 40px;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .thanks {
+    margin-top: 40px;
+    font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+    font-weight: 700;
+    color: var(--brand-light);
+  }
+
+  /* --- Controls --- */
+  #startOverlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    background-color: var(--bg);
+    background-image: radial-gradient(circle at 50% 40%, rgba(31,176,140,0.16), transparent 60%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    text-align: center;
+    padding: 6vh 8vw;
+  }
+
+  #startOverlay h1 { margin-bottom: 6px; }
+
+  #startBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--brand);
+    color: #04231c;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 34px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  #startBtn:hover { background: var(--brand-light); transform: translateY(-1px); }
+  #startBtn:active { transform: scale(0.98); }
+
+  #hud {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0 6vw 26px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  #hud.visible { opacity: 1; pointer-events: auto; }
+
+  #progressTrack {
+    width: min(760px, 84vw);
+    height: 4px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  #progressFill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--brand-dark), var(--brand-light));
+    transition: width 0.15s linear;
+  }
+
+  #controls {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .ctrl-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .ctrl-btn:hover { border-color: var(--brand); transform: translateY(-1px); }
+  .ctrl-btn svg { width: 18px; height: 18px; }
+
+  #dots {
+    display: flex;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .dot.active {
+    background: var(--brand-light);
+    transform: scale(1.35);
+  }
+
+  .caption {
+    max-width: 640px;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-align: center;
+    min-height: 1.2em;
+  }
+
+  @media (max-width: 760px) {
+    .cards, .arch-grid, .result-grid { grid-template-columns: 1fr; }
+    .flow-step { font-size: 0.8rem; padding: 10px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- Slide 0: Kirish -->
+  <section class="slide" data-index="0">
+    <div class="logo-badge">+</div>
+    <div class="eyebrow">Hackathon taqdimoti</div>
+    <h1>Med<span class="accent">Queue</span> Tashkent</h1>
+    <p class="subtitle">Onlayn navbat. Telegram orqali aqlli bildirishnoma. Raqamli tibbiy tarix — bittа joyda.</p>
+  </section>
+
+  <!-- Slide 1: Muammo -->
+  <section class="slide" data-index="1">
+    <div class="eyebrow">01 · Muammo</div>
+    <h1>Navbat — <span class="accent">noaniqlik</span> bilan</h1>
+    <div class="cards">
+      <div class="card amber">
+        <div class="icon">🕒</div>
+        <h3>Soatlab jonli navbat</h3>
+        <p>Bemorlar poliklinikada tik turib, uzoq vaqt kutishga majbur.</p>
+      </div>
+      <div class="card amber">
+        <div class="icon">❓</div>
+        <h3>Navbat noaniq</h3>
+        <p>Hech kim aniq javob bera olmaydi: "Mening navbatim qachon keladi?"</p>
+      </div>
+      <div class="card amber">
+        <div class="icon">📄</div>
+        <h3>Tibbiy tarix yo'qoladi</h3>
+        <p>Ko'rik va tahlil natijalari qog'ozda tarqoq, ko'pincha yo'qolib qoladi.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 2: Yechim -->
+  <section class="slide" data-index="2">
+    <div class="eyebrow">02 · Yechim</div>
+    <h1>Uch qadamda — <span class="accent">navbat tayyor</span></h1>
+    <div class="cards">
+      <div class="card brand">
+        <div class="icon">📱</div>
+        <h3>Onlayn navbat olish</h3>
+        <p>Klinika, bo'lim yoki tahlil turini tanlab, bir necha soniyada navbat olinadi.</p>
+      </div>
+      <div class="card brand">
+        <div class="icon">🔔</div>
+        <h3>Telegram bildirishnoma</h3>
+        <p>Navbat yaqinlashganda bot avtomatik xabar beradi — kutish shart emas.</p>
+      </div>
+      <div class="card brand">
+        <div class="icon">🗂️</div>
+        <h3>Tibbiy tarix bir joyda</h3>
+        <p>Barcha ko'rik va tahlil natijalari raqamli, doim qo'l ostida.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 3: Arxitektura -->
+  <section class="slide" data-index="3">
+    <div class="eyebrow">03 · Arxitektura</div>
+    <h1>Bitta repo, <span class="accent">to'rtta mustaqil qism</span></h1>
+    <div class="arch-grid">
+      <div class="arch-box">
+        <div class="icon">🌐</div>
+        <h4>Web</h4>
+        <span>Next.js · Tailwind</span>
+      </div>
+      <div class="arch-box">
+        <div class="icon">📢</div>
+        <h4>Landing</h4>
+        <span>Vite · React</span>
+      </div>
+      <div class="arch-box">
+        <div class="icon">⚙️</div>
+        <h4>Backend</h4>
+        <span>Express · MongoDB</span>
+      </div>
+      <div class="arch-box">
+        <div class="icon">🤖</div>
+        <h4>Telegram bot</h4>
+        <span>Telegraf</span>
+      </div>
+    </div>
+    <div class="deploy-row">
+      <span class="pill">▲ Vercel — web + landing</span>
+      <span class="pill">☁️ Render — backend + bot</span>
+      <span class="pill">🍃 MongoDB Atlas</span>
+    </div>
+  </section>
+
+  <!-- Slide 4: Live Demo -->
+  <section class="slide" data-index="4">
+    <div class="eyebrow">04 · Live Demo</div>
+    <h1>Ro'yxatdan tortib — <span class="accent">xabarnomagacha</span></h1>
+    <div class="flow">
+      <div class="flow-step">📝 Ro'yxatdan o'tish</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🏥 Klinika / bo'lim</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🔢 Navbat olish</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">🤖 Bot xabarnomasi</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">👨‍⚕️ Shifokor chaqiradi</div>
+    </div>
+  </section>
+
+  <!-- Slide 5: Natija -->
+  <section class="slide" data-index="5">
+    <div class="eyebrow">05 · Natija</div>
+    <h1>Ishlaydigan, <span class="accent">to'liq deploy</span> qilingan mahsulot</h1>
+    <div class="result-grid">
+      <div class="card violet">
+        <div class="icon">🌍</div>
+        <h3>3 til, 2 tema</h3>
+        <p>O'zbek, rus, ingliz · dark/light rejim · to'liq responsive.</p>
+      </div>
+      <div class="card sky">
+        <div class="icon">⏱️</div>
+        <h3>Kam kutish</h3>
+        <p>Bemor uchun aniqlik, shifokor uchun qulay boshqaruv paneli.</p>
+      </div>
+    </div>
+    <div class="thanks">MedQueue Tashkent — odamlarning vaqtini qadrlash haqida. Rahmat! 🙏</div>
+  </section>
+
+</div>
+
+<!-- Start overlay (browsers require a user gesture before audio can autoplay) -->
+<div id="startOverlay">
+  <div class="logo-badge">+</div>
+  <div class="eyebrow">MedQueue Tashkent</div>
+  <h1>Taqdimotni <span class="accent">boshlash</span></h1>
+  <p class="subtitle">Slaydlar va ovozli hikoya avtomatik sinxron ijro etiladi (~1.5 daqiqa).</p>
+  <button id="startBtn">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    Boshlash
+  </button>
+</div>
+
+<!-- Bottom HUD: progress + controls -->
+<div id="hud">
+  <div class="caption" id="caption"></div>
+  <div id="progressTrack"><div id="progressFill"></div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="prevBtn" aria-label="Oldingi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 20 9 12l10-8v16Z"/><path d="M5 19V5"/></svg>
+    </button>
+    <button class="ctrl-btn" id="playPauseBtn" aria-label="To'xtatish/Davom ettirish">
+      <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="ctrl-btn" id="nextBtn" aria-label="Keyingi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4l10 8-10 8V4Z"/><path d="M19 5v14"/></svg>
+    </button>
+    <div id="dots"></div>
+  </div>
+</div>
+
+<audio id="narration" preload="auto"></audio>
+
+<script>
+  const sections = [
+    { audio: "audio-01-hook.wav",         caption: "Muammo bilan tanishtirish" },
+    { audio: "audio-02-problem.mp3",      caption: "Muammo — soatlab navbat, tarqoq tibbiy tarix" },
+    { audio: "audio-03-solution.mp3",     caption: "Yechim — MedQueue Tashkent" },
+    { audio: "audio-04-architecture.mp3", caption: "Texnik arxitektura" },
+    { audio: "audio-05-demo.mp3",         caption: "Jonli demo oqimi" },
+    { audio: "audio-06-result.mp3",       caption: "Yakuniy natija" },
+  ];
+
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const audioEl = document.getElementById("narration");
+  const startOverlay = document.getElementById("startOverlay");
+  const startBtn = document.getElementById("startBtn");
+  const hud = document.getElementById("hud");
+  const progressFill = document.getElementById("progressFill");
+  const captionEl = document.getElementById("caption");
+  const dotsWrap = document.getElementById("dots");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const playPauseBtn = document.getElementById("playPauseBtn");
+  const playIcon = document.getElementById("playIcon");
+  const pauseIcon = document.getElementById("pauseIcon");
+
+  let current = 0;
+  let userPaused = false;
+
+  sections.forEach((_, i) => {
+    const d = document.createElement("div");
+    d.className = "dot" + (i === 0 ? " active" : "");
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function showSlide(i) {
+    slides.forEach((s) => s.classList.toggle("active", Number(s.dataset.index) === i));
+    dots.forEach((d, idx) => d.classList.toggle("active", idx === i));
+    captionEl.textContent = sections[i].caption;
+  }
+
+  function playSection(i) {
+    if (i < 0 || i >= sections.length) return;
+    current = i;
+    showSlide(i);
+    audioEl.src = sections[i].audio;
+    audioEl.currentTime = 0;
+    audioEl.play().catch(() => {});
+    userPaused = false;
+    updatePlayPauseIcon();
+  }
+
+  function updatePlayPauseIcon() {
+    const playing = !audioEl.paused && !audioEl.ended;
+    playIcon.style.display = playing ? "none" : "block";
+    pauseIcon.style.display = playing ? "block" : "none";
+  }
+
+  audioEl.addEventListener("ended", () => {
+    if (current + 1 < sections.length) {
+      playSection(current + 1);
+    } else {
+      updatePlayPauseIcon();
+    }
+  });
+
+  audioEl.addEventListener("timeupdate", () => {
+    if (!audioEl.duration) return;
+    const pct = (audioEl.currentTime / audioEl.duration) * 100;
+    progressFill.style.width = pct + "%";
+  });
+
+  audioEl.addEventListener("play", updatePlayPauseIcon);
+  audioEl.addEventListener("pause", updatePlayPauseIcon);
+
+  startBtn.addEventListener("click", () => {
+    startOverlay.style.display = "none";
+    hud.classList.add("visible");
+    playSection(0);
+  });
+
+  prevBtn.addEventListener("click", () => playSection(Math.max(0, current - 1)));
+  nextBtn.addEventListener("click", () => playSection(Math.min(sections.length - 1, current + 1)));
+
+  playPauseBtn.addEventListener("click", () => {
+    if (audioEl.paused) {
+      audioEl.play().catch(() => {});
+      userPaused = false;
+    } else {
+      audioEl.pause();
+      userPaused = true;
+    }
+  });
+
+  dots.forEach((d, i) => d.addEventListener("click", () => playSection(i)));
+
+  document.addEventListener("keydown", (e) => {
+    if (startOverlay.style.display !== "none") return;
+    if (e.key === "ArrowRight") playSection(Math.min(sections.length - 1, current + 1));
+    if (e.key === "ArrowLeft") playSection(Math.max(0, current - 1));
+    if (e.key === " ") { e.preventDefault(); playPauseBtn.click(); }
+  });
+
+</script>
+
+</body>
+</html>
