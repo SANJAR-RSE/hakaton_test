@@ -11,6 +11,7 @@ Toshkent shifoxonalari, poliklinikalari va xususiy klinikalarida bemorlar jonli 
 | Landing | https://landing-sand-eight-21.vercel.app | ✅ live |
 | Backend API | https://medqueue-backend-e8o3.onrender.com | ✅ live (`/health`) |
 | Telegram bot | https://t.me/hakatontest_bot | ✅ live |
+| Taqdimot (auto-play, ovozli) | https://presentation-henna-eight.vercel.app | ✅ live |
 
 > Eslatma: backend Render'ning bepul tarifida — ~15 daqiqa harakatsizlikdan keyin "uxlab qoladi", birinchi so'rov 30-60s cho'zilishi mumkin. Demo oldidan bir marta `/health`'ga so'rov yuborib "isitib qo'ying".
 
