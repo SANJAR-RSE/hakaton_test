@@ -297,3 +297,15 @@ console.log('[bot] MedQueue bot ishga tushmoqda (long polling)...');
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
+// Render'ning bepul tarifi ~15 daqiqa harakatsizlikdan keyin uxlab qoladi (bu esa
+// bildirishnoma va long-polling'ni to'xtatadi). O'zini va backend'ni muntazam
+// "isitib" turish orqali demo/ishlash davomida uyg'oq saqlaymiz.
+const axios = require('axios');
+if (process.env.PORT) {
+  const backendHealthUrl = (process.env.BACKEND_URL || '').replace(/\/api\/?$/, '/health');
+  setInterval(() => {
+    axios.get(`http://127.0.0.1:${process.env.PORT}/`).catch(() => {});
+    if (backendHealthUrl) axios.get(backendHealthUrl).catch(() => {});
+  }, 10 * 60 * 1000);
+}

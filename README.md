@@ -7,10 +7,12 @@ Toshkent shifoxonalari, poliklinikalari va xususiy klinikalarida bemorlar jonli 
 ## Live linklar
 | Qism | Manzil | Holat |
 |---|---|---|
-| Web (asosiy ilova) | _(deploy jarayonida — Vercel)_ | ⏳ |
-| Landing | _(deploy jarayonida — Vercel)_ | ⏳ |
-| Backend API | https://medqueue-backend-e8o3.onrender.com | ⏳ (Atlas whitelist kutilmoqda) |
-| Telegram bot | https://t.me/hakatontest_bot | ⏳ |
+| Web (asosiy ilova) | https://web-rho-ruby-41.vercel.app | ✅ live |
+| Landing | https://landing-sand-eight-21.vercel.app | ✅ live |
+| Backend API | https://medqueue-backend-e8o3.onrender.com | ✅ live (`/health`) |
+| Telegram bot | https://t.me/hakatontest_bot | ✅ live |
+
+> Eslatma: backend Render'ning bepul tarifida — ~15 daqiqa harakatsizlikdan keyin "uxlab qoladi", birinchi so'rov 30-60s cho'zilishi mumkin. Demo oldidan bir marta `/health`'ga so'rov yuborib "isitib qo'ying".
 
 ## Loyiha tuzilishi (monorepo)
 ```
