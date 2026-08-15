@@ -1,8 +1,17 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+function sign(user) {
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+}
+
 // Bot orqali: bemor telefon+parol bilan "kiradi" va shu bilan telegramId profiliga bog'lanadi.
+// Login bilan bir xil, farqi — telegramId'ni ham profilga yozib qo'yadi va bot navbat
+// olish/ko'rish uchun ishlata oladigan JWT token qaytaradi.
 router.post('/link', async (req, res) => {
   try {
     const { phone, password, telegramId } = req.body;
@@ -16,7 +25,33 @@ router.post('/link', async (req, res) => {
 
     user.telegramId = String(telegramId);
     await user.save();
-    res.json({ ok: true, user: { name: user.name, phone: user.phone } });
+    const token = sign(user);
+    res.json({ ok: true, token, user: { id: user._id, name: user.name, phone: user.phone, role: user.role } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Bot orqali: yangi bemor ro'yxatdan o'tishi va shu zahoti telegramId bilan bog'lanishi.
+router.post('/register', async (req, res) => {
+  try {
+    const { name, phone, password, telegramId } = req.body;
+    if (!name || !phone || !password || !telegramId) {
+      return res.status(400).json({ error: 'name, phone, password, telegramId shart' });
+    }
+    const exists = await User.findOne({ phone });
+    if (exists) return res.status(400).json({ error: 'Bu telefon raqam ro\'yxatdan o\'tgan' });
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.create({
+      name,
+      phone,
+      passwordHash,
+      role: 'patient',
+      telegramId: String(telegramId),
+    });
+    const token = sign(user);
+    res.json({ ok: true, token, user: { id: user._id, name: user.name, phone: user.phone, role: user.role } });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

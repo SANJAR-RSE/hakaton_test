@@ -63,8 +63,12 @@ resp: `[{ _id, appointmentId, doctorId, clinicId, departmentName, notes, resultT
 
 ## Telegram linking (used by bot)
 ### POST /api/telegram/link
-body: `{ phone, password, telegramId }`  (patient logs in from bot with same credentials to link)
-resp: `{ ok: true, user: { name, phone } }`
+body: `{ phone, password, telegramId }`  (patient logs in from bot with existing web credentials to link)
+resp: `{ ok: true, token, user: { id, name, phone, role } }` — token is a normal JWT, bot uses it for /api/appointments calls.
+
+### POST /api/telegram/register
+body: `{ name, phone, password, telegramId }`  (bot-only signup, no web account needed)
+resp: `{ ok: true, token, user: { id, name, phone, role } }`
 
 ### GET /api/telegram/status?telegramId=...
 resp: `{ linked: boolean, user? }`
