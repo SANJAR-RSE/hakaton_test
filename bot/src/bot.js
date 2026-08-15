@@ -9,6 +9,18 @@ if (!BOT_TOKEN) {
   process.exit(1);
 }
 
+// Render'ning bepul tarifida faqat "Web Service" bor (Background Worker pullik) —
+// shuning uchun bot jarayoni ichida PORT'ni tinglovchi mayda HTTP health-check
+// serveri ham ishga tushiramiz. Lokal ishga tushirishda PORT berilmasa — o'tkazib yuboriladi.
+if (process.env.PORT) {
+  require('http')
+    .createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, service: 'medqueue-bot' }));
+    })
+    .listen(process.env.PORT, () => console.log(`[bot] health-check ${process.env.PORT}-portda`));
+}
+
 const bot = new Telegraf(BOT_TOKEN);
 
 // chatId -> { action, step, data } — qisqa muddatli, ko'p qadamli suhbat holati
