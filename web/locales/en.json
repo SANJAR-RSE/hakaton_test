@@ -91,6 +91,7 @@
     "departmentsLoadError": "Couldn't load departments.",
     "departmentsEmpty": "No departments found at this clinic.",
     "departmentPlaceholder": "Select a department",
+    "departmentSectionTitle": "Select a department",
     "doctorLabel": "Doctor (optional)",
     "doctorAny": "No preference",
     "dateLabel": "Date",

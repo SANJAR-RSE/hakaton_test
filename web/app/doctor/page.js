@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import RequireAuth from "@/components/RequireAuth";
 import RecordModal from "@/components/RecordModal";
+import Select from "@/components/Select";
 import { apiFetch, errorMessage } from "@/lib/api";
 import { fieldName } from "@/lib/format";
 import { useI18n } from "@/lib/I18nContext";
@@ -181,48 +182,34 @@ function DoctorQueue() {
   return (
     <div className="flex flex-col gap-6">
       <Card>
-        <h1 className="mb-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+        <h1 className="mb-1.5 text-xl font-bold text-slate-800 dark:text-slate-100">
           {t("doctor.title")}
         </h1>
-        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">
           {t("doctor.subtitle")}
         </p>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Field label={t("doctor.clinicLabel")}>
-            <select
-              className={selectClass}
+            <Select
               value={clinicId}
-              onChange={(e) => {
-                setClinicId(e.target.value);
+              onChange={(val) => {
+                setClinicId(val);
                 setDepartmentId("");
               }}
-            >
-              <option value="">{t("doctor.select")}</option>
-              {clinics.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              options={clinics.map((c) => ({ value: c._id, label: c.name }))}
+              placeholder={t("doctor.select")}
+            />
           </Field>
 
           <Field label={t("doctor.departmentLabel")}>
-            <select
-              className={selectClass}
+            <Select
               value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
+              onChange={setDepartmentId}
+              options={departments.map((d) => ({ value: d._id, label: d.name }))}
+              placeholder={departmentsState === "loading" ? t("doctor.loading") : t("doctor.select")}
               disabled={!clinicId || departmentsState === "loading"}
-            >
-              <option value="">
-                {departmentsState === "loading" ? t("doctor.loading") : t("doctor.select")}
-              </option>
-              {departments.map((d) => (
-                <option key={d._id} value={d._id}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
+            />
           </Field>
 
           <Field label={t("doctor.dateLabel")}>

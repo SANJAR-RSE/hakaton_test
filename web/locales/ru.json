@@ -91,6 +91,7 @@
     "departmentsLoadError": "Не удалось загрузить отделения.",
     "departmentsEmpty": "В этой клинике отделения не найдены.",
     "departmentPlaceholder": "Выберите отделение",
+    "departmentSectionTitle": "Выберите отделение",
     "doctorLabel": "Врач (необязательно)",
     "doctorAny": "Не важно",
     "dateLabel": "Дата",

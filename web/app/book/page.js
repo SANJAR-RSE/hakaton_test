@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
+import Select from "@/components/Select";
 import { apiFetch, errorMessage } from "@/lib/api";
 import { useI18n } from "@/lib/I18nContext";
 import {
@@ -11,6 +12,7 @@ import {
   ErrorState,
   Field,
   Loading,
+  StatusBadge,
   selectClass,
 } from "@/components/UI";
 
@@ -19,6 +21,24 @@ function todayStr() {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+const DEPT_TYPE_STYLES = {
+  consultation:
+    "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-700/60",
+  analysis:
+    "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:border-violet-700/60",
+};
+
+function DepartmentTypeBadge({ type, label }) {
+  const className = DEPT_TYPE_STYLES[type] || DEPT_TYPE_STYLES.consultation;
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium ${className}`}
+    >
+      {label}
+    </span>
+  );
 }
 
 function BookForm() {
@@ -154,11 +174,9 @@ function BookForm() {
         <p className="my-3 text-5xl font-extrabold text-brand-600 dark:text-brand-400">
           {result.queueNumber ?? "—"}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          {t("book.statusLabel")}{" "}
-          <span className="font-medium text-slate-700 dark:text-slate-200">
-            {result.status || "pending"}
-          </span>
+        <p className="flex items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+          {t("book.statusLabel")}
+          <StatusBadge status={result.status || "pending"} />
         </p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Link href="/appointments">
@@ -184,36 +202,42 @@ function BookForm() {
     return <ErrorState message={t("book.clinicsEmpty")} />;
   }
 
+  const clinicOptions = clinics.map((c) => ({
+    value: c._id,
+    label: c.address ? `${c.name} — ${c.address}` : c.name,
+  }));
+
+  const doctorOptions = [
+    { value: "", label: t("book.doctorAny") },
+    ...doctors.map((doc) => ({ value: doc._id, label: doc.name })),
+  ];
+
   return (
-    <Card className="mx-auto max-w-md">
-      <h1 className="mb-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+    <Card className="mx-auto max-w-xl">
+      <h1 className="mb-1.5 text-xl font-bold text-slate-800 dark:text-slate-100">
         {t("book.title")}
       </h1>
-      <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">{t("book.subtitle")}</p>
+      <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">{t("book.subtitle")}</p>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
         <Field label={t("book.clinicLabel")}>
-          <select
-            className={selectClass}
+          <Select
             value={clinicId}
-            onChange={(e) => {
-              setClinicId(e.target.value);
+            onChange={(val) => {
+              setClinicId(val);
               setDepartmentId("");
               setDoctorId("");
             }}
-          >
-            <option value="">{t("book.clinicPlaceholder")}</option>
-            {clinics.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-                {c.address ? ` — ${c.address}` : ""}
-              </option>
-            ))}
-          </select>
+            options={clinicOptions}
+            placeholder={t("book.clinicPlaceholder")}
+          />
         </Field>
 
         {clinicId && (
-          <Field label={t("book.departmentLabel")}>
+          <div className="flex animate-fade-in flex-col gap-2">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {t("book.departmentSectionTitle")}
+            </span>
             {departmentsState === "loading" && (
               <p className="text-sm text-slate-400 dark:text-slate-500">{t("book.loading")}</p>
             )}
@@ -228,52 +252,63 @@ function BookForm() {
               </p>
             )}
             {departmentsState === "ready" && departments.length > 0 && (
-              <select
-                className={selectClass}
-                value={departmentId}
-                onChange={(e) => {
-                  setDepartmentId(e.target.value);
-                  setDoctorId("");
-                }}
-              >
-                <option value="">{t("book.departmentPlaceholder")}</option>
-                {departments.map((d) => (
-                  <option key={d._id} value={d._id}>
-                    {d.name} ({TYPE_LABEL[d.type] || d.type})
-                  </option>
-                ))}
-              </select>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {departments.map((d) => {
+                  const active = departmentId === d._id;
+                  return (
+                    <button
+                      key={d._id}
+                      type="button"
+                      onClick={() => {
+                        setDepartmentId(d._id);
+                        setDoctorId("");
+                      }}
+                      className={`flex flex-col gap-2 rounded-xl2 border p-4 text-left transition ${
+                        active
+                          ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-900/30"
+                          : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/40 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-brand-700 dark:hover:bg-brand-900/10"
+                      }`}
+                    >
+                      <span className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">
+                        {d.name}
+                      </span>
+                      <DepartmentTypeBadge
+                        type={d.type}
+                        label={TYPE_LABEL[d.type] || d.type}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             )}
-          </Field>
+          </div>
         )}
 
         {departmentId && doctorsState === "ready" && doctors.length > 0 && (
-          <Field label={t("book.doctorLabel")}>
-            <select
-              className={selectClass}
-              value={doctorId}
-              onChange={(e) => setDoctorId(e.target.value)}
-            >
-              <option value="">{t("book.doctorAny")}</option>
-              {doctors.map((doc) => (
-                <option key={doc._id} value={doc._id}>
-                  {doc.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <div className="animate-fade-in">
+            <Field label={t("book.doctorLabel")}>
+              <Select
+                value={doctorId}
+                onChange={setDoctorId}
+                options={doctorOptions}
+                placeholder={t("book.doctorAny")}
+              />
+            </Field>
+          </div>
         )}
 
         {departmentId && (
-          <Field label={t("book.dateLabel")}>
-            <input
-              type="date"
-              className={selectClass}
-              min={todayStr()}
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </Field>
+          <div className="animate-fade-in">
+            <Field label={t("book.dateLabel")}>
+              <input
+                type="date"
+                className={selectClass}
+                min={todayStr()}
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
+            </Field>
+          </div>
         )}
 
         {submitError && (

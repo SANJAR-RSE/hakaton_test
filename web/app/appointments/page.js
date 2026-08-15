@@ -181,10 +181,10 @@ function AppointmentsPageContent() {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
             {t("appointments.title")}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {t("appointments.subtitle")}
           </p>
         </div>

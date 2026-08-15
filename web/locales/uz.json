@@ -91,6 +91,7 @@
     "departmentsLoadError": "Bo'limlarni yuklab bo'lmadi.",
     "departmentsEmpty": "Bu klinikada bo'lim topilmadi.",
     "departmentPlaceholder": "Bo'limni tanlang",
+    "departmentSectionTitle": "Bo'limni tanlang",
     "doctorLabel": "Shifokor (ixtiyoriy)",
     "doctorAny": "Farqi yo'q",
     "dateLabel": "Sana",
