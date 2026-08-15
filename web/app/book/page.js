@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, errorMessage } from "@/lib/api";
+import { useI18n } from "@/lib/I18nContext";
 import {
   Button,
   Card,
@@ -20,12 +21,13 @@ function todayStr() {
   return `${d.getFullYear()}-${mm}-${dd}`;
 }
 
-const TYPE_LABEL = {
-  consultation: "Konsultatsiya",
-  analysis: "Tahlil",
-};
-
 function BookForm() {
+  const { t } = useI18n();
+  const TYPE_LABEL = {
+    consultation: t("book.typeConsultation"),
+    analysis: t("book.typeAnalysis"),
+  };
+
   const [clinics, setClinics] = useState([]);
   const [clinicsState, setClinicsState] = useState("loading"); // loading | ready | error
 
@@ -109,7 +111,7 @@ function BookForm() {
     e.preventDefault();
     setSubmitError("");
     if (!clinicId || !departmentId || !date) {
-      setSubmitError("Klinika, bo'lim va sanani tanlang.");
+      setSubmitError(t("book.validationError"));
       return;
     }
     setSubmitting(true);
@@ -122,7 +124,7 @@ function BookForm() {
       });
       setResult(data);
     } catch (err) {
-      setSubmitError(err.message || "Navbat olishda xatolik yuz berdi.");
+      setSubmitError(errorMessage(err, t, "book.submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -140,23 +142,30 @@ function BookForm() {
   if (result) {
     return (
       <Card className="mx-auto max-w-md text-center">
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-2xl text-brand-600">
+        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-2xl text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
           ✓
         </div>
-        <h2 className="text-lg font-bold text-slate-800">Navbat olindi!</h2>
-        <p className="mt-2 text-sm text-slate-500">Sizning navbat raqamingiz:</p>
-        <p className="my-3 text-5xl font-extrabold text-brand-600">
+        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+          {t("book.successTitle")}
+        </h2>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+          {t("book.queueNumberLabel")}
+        </p>
+        <p className="my-3 text-5xl font-extrabold text-brand-600 dark:text-brand-400">
           {result.queueNumber ?? "—"}
         </p>
-        <p className="text-sm text-slate-500">
-          Holat: <span className="font-medium text-slate-700">{result.status || "pending"}</span>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {t("book.statusLabel")}{" "}
+          <span className="font-medium text-slate-700 dark:text-slate-200">
+            {result.status || "pending"}
+          </span>
         </p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <Link href="/appointments">
-            <Button className="w-full sm:w-auto">Navbatlarimni ko'rish</Button>
+            <Button className="w-full sm:w-auto">{t("book.viewAppointments")}</Button>
           </Link>
           <Button variant="secondary" onClick={resetForm} className="w-full sm:w-auto">
-            Yana navbat olish
+            {t("book.bookAgain")}
           </Button>
         </div>
       </Card>
@@ -164,28 +173,26 @@ function BookForm() {
   }
 
   if (clinicsState === "loading") {
-    return <Loading text="Klinikalar yuklanmoqda..." />;
+    return <Loading text={t("book.clinicsLoading")} />;
   }
 
   if (clinicsState === "error") {
-    return <ErrorState message="Klinikalarni yuklab bo'lmadi." onRetry={loadClinics} />;
+    return <ErrorState message={t("book.clinicsLoadError")} onRetry={loadClinics} />;
   }
 
   if (clinicsState === "ready" && clinics.length === 0) {
-    return (
-      <ErrorState message="Hozircha klinikalar mavjud emas. Keyinroq urinib ko'ring." />
-    );
+    return <ErrorState message={t("book.clinicsEmpty")} />;
   }
 
   return (
     <Card className="mx-auto max-w-md">
-      <h1 className="mb-1 text-lg font-bold text-slate-800">Navbat olish</h1>
-      <p className="mb-5 text-sm text-slate-500">
-        Klinika va bo'limni tanlab, navbat oling.
-      </p>
+      <h1 className="mb-1 text-lg font-bold text-slate-800 dark:text-slate-100">
+        {t("book.title")}
+      </h1>
+      <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">{t("book.subtitle")}</p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Field label="Klinika">
+        <Field label={t("book.clinicLabel")}>
           <select
             className={selectClass}
             value={clinicId}
@@ -195,7 +202,7 @@ function BookForm() {
               setDoctorId("");
             }}
           >
-            <option value="">Klinikani tanlang</option>
+            <option value="">{t("book.clinicPlaceholder")}</option>
             {clinics.map((c) => (
               <option key={c._id} value={c._id}>
                 {c.name}
@@ -206,15 +213,19 @@ function BookForm() {
         </Field>
 
         {clinicId && (
-          <Field label="Bo'lim / tahlil turi">
+          <Field label={t("book.departmentLabel")}>
             {departmentsState === "loading" && (
-              <p className="text-sm text-slate-400">Yuklanmoqda...</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500">{t("book.loading")}</p>
             )}
             {departmentsState === "error" && (
-              <p className="text-sm text-red-500">Bo'limlarni yuklab bo'lmadi.</p>
+              <p className="text-sm text-red-500 dark:text-red-400">
+                {t("book.departmentsLoadError")}
+              </p>
             )}
             {departmentsState === "ready" && departments.length === 0 && (
-              <p className="text-sm text-slate-400">Bu klinikada bo'lim topilmadi.</p>
+              <p className="text-sm text-slate-400 dark:text-slate-500">
+                {t("book.departmentsEmpty")}
+              </p>
             )}
             {departmentsState === "ready" && departments.length > 0 && (
               <select
@@ -225,7 +236,7 @@ function BookForm() {
                   setDoctorId("");
                 }}
               >
-                <option value="">Bo'limni tanlang</option>
+                <option value="">{t("book.departmentPlaceholder")}</option>
                 {departments.map((d) => (
                   <option key={d._id} value={d._id}>
                     {d.name} ({TYPE_LABEL[d.type] || d.type})
@@ -237,13 +248,13 @@ function BookForm() {
         )}
 
         {departmentId && doctorsState === "ready" && doctors.length > 0 && (
-          <Field label="Shifokor (ixtiyoriy)">
+          <Field label={t("book.doctorLabel")}>
             <select
               className={selectClass}
               value={doctorId}
               onChange={(e) => setDoctorId(e.target.value)}
             >
-              <option value="">Farqi yo'q</option>
+              <option value="">{t("book.doctorAny")}</option>
               {doctors.map((doc) => (
                 <option key={doc._id} value={doc._id}>
                   {doc.name}
@@ -254,7 +265,7 @@ function BookForm() {
         )}
 
         {departmentId && (
-          <Field label="Sana">
+          <Field label={t("book.dateLabel")}>
             <input
               type="date"
               className={selectClass}
@@ -266,7 +277,7 @@ function BookForm() {
         )}
 
         {submitError && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
             {submitError}
           </p>
         )}
@@ -276,7 +287,7 @@ function BookForm() {
           disabled={submitting || !clinicId || !departmentId || !date}
           className="w-full"
         >
-          {submitting ? "Yuborilmoqda..." : "Navbat olish"}
+          {submitting ? t("book.submitting") : t("book.submit")}
         </Button>
       </form>
     </Card>

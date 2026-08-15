@@ -7,6 +7,11 @@ body {
   background-color: #f7faf9;
 }
 
+html.dark,
+html.dark body {
+  background-color: #020617;
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }

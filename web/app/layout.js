@@ -1,5 +1,5 @@
 import "./globals.css";
-import { AuthProvider } from "@/lib/AuthContext";
+import Providers from "@/components/Providers";
 import Navbar from "@/components/Navbar";
 
 export const metadata = {
@@ -12,16 +12,35 @@ export const viewport = {
   initialScale: 1,
 };
 
+const themeInitScript = `
+(function () {
+  try {
+    var stored = localStorage.getItem("mq_theme");
+    var dark =
+      stored === "dark" ||
+      (stored !== "light" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    }
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }) {
   return (
     <html lang="uz">
-      <body className="min-h-screen bg-[#f7faf9] text-slate-900 antialiased">
-        <AuthProvider>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="min-h-screen bg-[#f7faf9] text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+        <Providers>
           <Navbar />
-          <main className="mx-auto min-h-[calc(100vh-57px)] max-w-4xl px-4 py-6">
+          <main className="mx-auto min-h-[calc(100vh-57px)] max-w-4xl px-4 py-6 pb-24 sm:pb-6">
             {children}
           </main>
-        </AuthProvider>
+        </Providers>
       </body>
     </html>
   );

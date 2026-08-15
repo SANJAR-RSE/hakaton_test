@@ -75,9 +75,14 @@ export async function apiFetch(path, options = {}) {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch (err) {
-    throw new Error(
+    // Bu yerda `useI18n()` chaqirib bo'lmaydi (oddiy modul, komponent emas) —
+    // shuning uchun tarjima kalitini belgilab qo'yamiz, chaqiruvchi tomon
+    // `err.i18nKey` bo'lsa shuni t() bilan ko'rsatadi, aks holda `err.message`ga tushadi.
+    const error = new Error(
       "Serverga ulanib bo'lmadi. Internet aloqasini yoki server holatini tekshiring."
     );
+    error.i18nKey = "common.networkError";
+    throw error;
   }
 
   let data = null;
@@ -88,15 +93,28 @@ export async function apiFetch(path, options = {}) {
   }
 
   if (!res.ok) {
-    const message =
-      (data && (data.error || data.message)) ||
-      `Xatolik yuz berdi (${res.status})`;
-    const error = new Error(message);
+    // Backend'dan kelgan xabar (data.error) hozircha faqat o'zbekcha — bu backend
+    // localizatsiyasini talab qiladi, shuning uchun aynan shu holatda i18nKey
+    // qo'yilmaydi va xabar backend tilida ko'rsatiladi.
+    const serverMessage = data && (data.error || data.message);
+    const error = new Error(serverMessage || `Xatolik yuz berdi (${res.status})`);
     error.status = res.status;
+    if (!serverMessage) error.i18nKey = "common.error";
     throw error;
   }
 
   return data;
+}
+
+/**
+ * apiFetch'dan tushgan xatoni joriy tilga mos qilib matnga aylantiradi.
+ * `err.i18nKey` bo'lsa (tarmoq xatosi yoki backend'dan xabarsiz status xatosi)
+ * shuni tarjima qiladi; aks holda backend'ning o'z xabarini (`err.message`,
+ * hozircha faqat o'zbekcha) yoki berilgan zaxira kalitni ko'rsatadi.
+ */
+export function errorMessage(err, t, fallbackKey) {
+  if (err && err.i18nKey) return t(err.i18nKey);
+  return (err && err.message) || t(fallbackKey);
 }
 
 export { API_URL };

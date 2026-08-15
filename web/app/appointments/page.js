@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { apiFetch } from "@/lib/api";
+import { apiFetch, errorMessage } from "@/lib/api";
 import { fieldName, formatDate } from "@/lib/format";
+import { useI18n } from "@/lib/I18nContext";
 import {
   Button,
   Card,
@@ -15,6 +16,7 @@ import {
 } from "@/components/UI";
 
 function AppointmentsList() {
+  const { t } = useI18n();
   const [appointments, setAppointments] = useState([]);
   const [state, setState] = useState("loading"); // loading | ready | error
   const [cancellingId, setCancellingId] = useState(null);
@@ -35,7 +37,7 @@ function AppointmentsList() {
   }, []);
 
   async function handleCancel(id) {
-    if (!confirm("Ushbu navbatni bekor qilmoqchimisiz?")) return;
+    if (!confirm(t("appointments.cancelConfirm"))) return;
     setCancellingId(id);
     try {
       await apiFetch(`/appointments/${id}`, { method: "DELETE" });
@@ -43,22 +45,22 @@ function AppointmentsList() {
         prev.map((a) => (a._id === id ? { ...a, status: "cancelled" } : a))
       );
     } catch (err) {
-      alert(err.message || "Bekor qilib bo'lmadi.");
+      alert(errorMessage(err, t, "appointments.cancelError"));
     } finally {
       setCancellingId(null);
     }
   }
 
-  if (state === "loading") return <Loading text="Navbatlar yuklanmoqda..." />;
+  if (state === "loading") return <Loading text={t("appointments.loading")} />;
   if (state === "error")
-    return <ErrorState message="Navbatlarni yuklab bo'lmadi." onRetry={load} />;
+    return <ErrorState message={t("appointments.loadError")} onRetry={load} />;
 
   if (appointments.length === 0) {
     return (
       <EmptyState
         icon="📅"
-        title="Hozircha navbatlaringiz yo'q"
-        subtitle="Yangi navbat olish uchun quyidagi tugmani bosing."
+        title={t("appointments.emptyTitle")}
+        subtitle={t("appointments.emptySubtitle")}
       />
     );
   }
@@ -71,18 +73,21 @@ function AppointmentsList() {
           <Card key={a._id} className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-slate-800">
-                  {fieldName(a.clinicId, "Klinika")}
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                  {fieldName(a.clinicId, t("appointments.clinicFallback"))}
                 </span>
                 <StatusBadge status={a.status} />
               </div>
-              <p className="mt-1 text-sm text-slate-500">
-                {fieldName(a.departmentId, "Bo'lim")}
-                {a.doctorId ? ` · ${fieldName(a.doctorId, "Shifokor")}` : ""}
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {fieldName(a.departmentId, t("appointments.departmentFallback"))}
+                {a.doctorId
+                  ? ` · ${fieldName(a.doctorId, t("appointments.doctorFallback"))}`
+                  : ""}
               </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Sana: {formatDate(a.date)} · Navbat raqami:{" "}
-                <span className="font-semibold text-brand-600">
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
+                {t("appointments.dateLabel")} {formatDate(a.date)} ·{" "}
+                {t("appointments.queueNumberLabel")}{" "}
+                <span className="font-semibold text-brand-600 dark:text-brand-400">
                   {a.queueNumber ?? "—"}
                 </span>
               </p>
@@ -94,7 +99,7 @@ function AppointmentsList() {
                 onClick={() => handleCancel(a._id)}
                 className="self-start sm:self-center"
               >
-                {cancellingId === a._id ? "Bekor qilinmoqda..." : "Bekor qilish"}
+                {cancellingId === a._id ? t("appointments.cancelling") : t("appointments.cancel")}
               </Button>
             )}
           </Card>
@@ -105,6 +110,7 @@ function AppointmentsList() {
 }
 
 function MedicalHistory() {
+  const { t } = useI18n();
   const [records, setRecords] = useState([]);
   const [state, setState] = useState("loading");
 
@@ -123,16 +129,16 @@ function MedicalHistory() {
     load();
   }, []);
 
-  if (state === "loading") return <Loading text="Tibbiy tarix yuklanmoqda..." />;
+  if (state === "loading") return <Loading text={t("appointments.historyLoading")} />;
   if (state === "error")
-    return <ErrorState message="Tibbiy tarixni yuklab bo'lmadi." onRetry={load} />;
+    return <ErrorState message={t("appointments.historyLoadError")} onRetry={load} />;
 
   if (records.length === 0) {
     return (
       <EmptyState
         icon="🩺"
-        title="Tibbiy tarix mavjud emas"
-        subtitle="Qabuldan so'ng shifokor natijalari shu yerda ko'rinadi."
+        title={t("appointments.historyEmptyTitle")}
+        subtitle={t("appointments.historyEmptySubtitle")}
       />
     );
   }
@@ -142,24 +148,25 @@ function MedicalHistory() {
       {records.map((r) => (
         <Card key={r._id}>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-sm font-semibold text-slate-800">
-              {r.departmentName || fieldName(r.clinicId, "Bo'lim")}
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+              {r.departmentName || fieldName(r.clinicId, t("appointments.departmentFallback"))}
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 dark:text-slate-500">
               {formatDate(r.date || r.createdAt)}
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            Shifokor: {fieldName(r.doctorId, "Noma'lum")}
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {t("appointments.doctorFallback")}:{" "}
+            {fieldName(r.doctorId, t("appointments.unknownDoctor"))}
           </p>
           {r.resultText && (
-            <p className="mt-2 text-sm text-slate-700">
-              <span className="font-medium">Natija:</span> {r.resultText}
+            <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">
+              <span className="font-medium">{t("appointments.resultLabel")}</span> {r.resultText}
             </p>
           )}
           {r.notes && (
-            <p className="mt-1 text-sm text-slate-600">
-              <span className="font-medium">Izoh:</span> {r.notes}
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              <span className="font-medium">{t("appointments.notesLabel")}</span> {r.notes}
             </p>
           )}
         </Card>
@@ -169,22 +176,29 @@ function MedicalHistory() {
 }
 
 function AppointmentsPageContent() {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-lg font-bold text-slate-800">Navbatlarim</h1>
-          <p className="text-sm text-slate-500">Joriy va o'tgan navbatlaringiz</p>
+          <h1 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+            {t("appointments.title")}
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t("appointments.subtitle")}
+          </p>
         </div>
         <Link href="/book">
-          <Button>+ Navbat olish</Button>
+          <Button>{t("appointments.bookButton")}</Button>
         </Link>
       </div>
 
       <AppointmentsList />
 
       <div>
-        <h2 className="mb-3 text-base font-bold text-slate-800">Tibbiy tarix</h2>
+        <h2 className="mb-3 text-base font-bold text-slate-800 dark:text-slate-100">
+          {t("appointments.historyTitle")}
+        </h2>
         <MedicalHistory />
       </div>
     </div>

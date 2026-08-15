@@ -4,9 +4,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { Loading } from "@/components/UI";
+import { useI18n } from "@/lib/I18nContext";
 
 export default function HomePage() {
   const { user, token, loading } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
-      <Loading text="Yo'naltirilmoqda..." />
+      <Loading text={t("common.redirecting")} />
     </div>
   );
 }

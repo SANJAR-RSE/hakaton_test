@@ -4,10 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
+import { useI18n } from "@/lib/I18nContext";
+import { errorMessage } from "@/lib/api";
 import { Button, Card, Field, inputClass } from "@/components/UI";
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const { t } = useI18n();
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +21,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     if (!phone.trim() || !password) {
-      setError("Telefon raqam va parolni kiriting.");
+      setError(t("login.validationError"));
       return;
     }
     setSubmitting(true);
@@ -30,7 +33,7 @@ export default function LoginPage() {
         router.replace("/appointments");
       }
     } catch (err) {
-      setError(err.message || "Kirishda xatolik yuz berdi.");
+      setError(errorMessage(err, t, "login.submitError"));
     } finally {
       setSubmitting(false);
     }
@@ -40,14 +43,16 @@ export default function LoginPage() {
     <div className="flex min-h-[70vh] items-center justify-center">
       <Card className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <h1 className="text-xl font-bold text-slate-800">Xush kelibsiz</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Hisobingizga kiring
+          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+            {t("login.title")}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {t("login.subtitle")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="Telefon raqam">
+          <Field label={t("login.phoneLabel")}>
             <input
               className={inputClass}
               type="tel"
@@ -58,7 +63,7 @@ export default function LoginPage() {
             />
           </Field>
 
-          <Field label="Parol">
+          <Field label={t("login.passwordLabel")}>
             <input
               className={inputClass}
               type="password"
@@ -70,20 +75,20 @@ export default function LoginPage() {
           </Field>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
               {error}
             </p>
           )}
 
           <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? "Kirilmoqda..." : "Kirish"}
+            {submitting ? t("login.submitting") : t("login.submit")}
           </Button>
         </form>
 
-        <p className="mt-5 text-center text-sm text-slate-500">
-          Hisobingiz yo'qmi?{" "}
-          <Link href="/register" className="font-medium text-brand-600 hover:underline">
-            Ro'yxatdan o'tish
+        <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
+          {t("login.noAccount")}{" "}
+          <Link href="/register" className="font-medium text-brand-600 hover:underline dark:text-brand-400">
+            {t("login.registerLink")}
           </Link>
         </p>
       </Card>
